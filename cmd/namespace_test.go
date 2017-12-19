@@ -13,7 +13,7 @@ func TestDaemonSetNotInNamespace(t *testing.T) {
 }
 
 func TestDeploymentInNamespace(t *testing.T) {
-	runTestInNamespace(t, "fakeDeploymentSC", "capabilities_some_dropped.yml", auditCapabilities, ErrorCapabilitiesSomeDropped)
+	runTestInNamespace(t, "fakeDeploymentSC", "capabilities_some_dropped.yml", auditCapabilities, ErrorCapabilityNotDropped)
 }
 
 func TestDeploymentNotInNamespace(t *testing.T) {
@@ -29,7 +29,7 @@ func TestStatefulSetNotInNamespace(t *testing.T) {
 }
 
 func TestReplicationControllerInNamespace(t *testing.T) {
-	runTestInNamespace(t, "fakeReplicationControllerASAT", "service_account_token_nil_and_no_name.yml", auditAutomountServiceAccountToken, ErrorServiceAccountTokenNILAndNoName)
+	runTestInNamespace(t, "fakeReplicationControllerASAT", "service_account_token_nil_and_no_name.yml", auditAutomountServiceAccountToken, ErrorAutomountServiceAccountTokenNILAndNoName)
 }
 
 func TestReplicationControllerNotInNamespace(t *testing.T) {

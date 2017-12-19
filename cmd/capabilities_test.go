@@ -30,13 +30,13 @@ func TestCapabilitiesNIL(t *testing.T) {
 }
 
 func TestCapabilitiesAdded(t *testing.T) {
-	runTest(t, "capabilities_added.yml", auditCapabilities, ErrorCapabilitiesAdded)
+	runTest(t, "capabilities_added.yml", auditCapabilities, ErrorCapabilityAdded)
 }
 
-func TestCapabilitiesNoneDropped(t *testing.T) {
-	runTest(t, "capabilities_none_dropped.yml", auditCapabilities, ErrorCapabilitiesNoneDropped)
+func TestCapabilitiesSomeAllowed(t *testing.T) {
+	runTest(t, "capabilities_some_allowed.yml", auditCapabilities, ErrorCapabilityAllowed)
 }
 
 func TestCapabilitiesSomeDropped(t *testing.T) {
-	runTest(t, "capabilities_some_dropped.yml", auditCapabilities, ErrorCapabilitiesSomeDropped)
+	runTest(t, "capabilities_some_dropped.yml", auditCapabilities, ErrorCapabilityNotDropped)
 }

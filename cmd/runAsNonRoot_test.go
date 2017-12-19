@@ -15,3 +15,7 @@ func TestRunAsNonRootNil(t *testing.T) {
 func TestRunAsNonRootFalse(t *testing.T) {
 	runTest(t, "run_as_non_root_false.yml", auditRunAsNonRoot, ErrorRunAsNonRootFalse)
 }
+
+func TestAllowRunAsRootFalseAllowed(t *testing.T) {
+	runTest(t, "run_as_non_root_false_allowed.yml", auditRunAsNonRoot, ErrorRunAsNonRootFalseAllowed)
+}

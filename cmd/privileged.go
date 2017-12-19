@@ -6,18 +6,39 @@ import (
 
 func checkPrivileged(container Container, result *Result) {
 	if container.SecurityContext == nil {
-		occ := Occurrence{id: ErrorSecurityContextNIL, kind: Error, message: "SecurityContext not set, please set it!"}
+		occ := Occurrence{
+			id:      ErrorSecurityContextNIL,
+			kind:    Error,
+			message: "SecurityContext not set, please set it!",
+		}
+		result.Occurrences = append(result.Occurrences, occ)
+		return
+	}
+	if reason := result.Labels["kubeaudit.allow.privileged"]; reason != "" {
+		occ := Occurrence{
+			id:       ErrorPrivilegedTrueAllowed,
+			kind:     Warn,
+			message:  "Allowed setting privileged to true",
+			metadata: Metadata{"Reason": prettifyReason(reason)},
+		}
 		result.Occurrences = append(result.Occurrences, occ)
 		return
 	}
 	if container.SecurityContext.Privileged == nil {
-		// TODO find out what this exactly means
-		occ := Occurrence{id: ErrorPrivilegedNIL, kind: Warn, message: "Privileged defaults to false, which results in non privileged, which is okay."}
+		occ := Occurrence{
+			id:      ErrorPrivilegedNIL,
+			kind:    Warn,
+			message: "Privileged defaults to false, which results in non privileged, which is okay.",
+		}
 		result.Occurrences = append(result.Occurrences, occ)
 		return
 	}
 	if *container.SecurityContext.Privileged == true {
-		occ := Occurrence{id: ErrorPrivilegedTrue, kind: Error, message: "Privileged set to true! Please change it to false!"}
+		occ := Occurrence{
+			id:      ErrorPrivilegedTrue,
+			kind:    Error,
+			message: "Privileged set to true! Please change it to false!",
+		}
 		result.Occurrences = append(result.Occurrences, occ)
 		return
 	}
@@ -33,9 +54,6 @@ func auditPrivileged(items Items) (results []Result) {
 				break
 			}
 		}
-	}
-	for _, result := range results {
-		result.Print()
 	}
 	return
 }

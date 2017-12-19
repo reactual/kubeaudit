@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"runtime"
+	"strings"
 	"sync"
 
 	log "github.com/sirupsen/logrus"
@@ -157,6 +158,7 @@ func containerIter(t interface{}) (containers []Container, result *Result) {
 			Name:      kubeType.Name,
 			Namespace: kubeType.Namespace,
 			KubeType:  "deployment",
+			Labels:    kubeType.Spec.Template.Labels,
 		}
 		return
 
@@ -166,6 +168,7 @@ func containerIter(t interface{}) (containers []Container, result *Result) {
 			Name:      kubeType.Name,
 			Namespace: kubeType.Namespace,
 			KubeType:  "statefulSet",
+			Labels:    kubeType.Spec.Template.Labels,
 		}
 		return
 
@@ -175,6 +178,7 @@ func containerIter(t interface{}) (containers []Container, result *Result) {
 			Name:      kubeType.Name,
 			Namespace: kubeType.Namespace,
 			KubeType:  "daemonSet",
+			Labels:    kubeType.Spec.Template.Labels,
 		}
 		return
 
@@ -184,6 +188,7 @@ func containerIter(t interface{}) (containers []Container, result *Result) {
 			Name:      kubeType.Name,
 			Namespace: kubeType.Namespace,
 			KubeType:  "pod",
+			Labels:    kubeType.Labels,
 		}
 		return
 
@@ -193,6 +198,7 @@ func containerIter(t interface{}) (containers []Container, result *Result) {
 			Name:      kubeType.Name,
 			Namespace: kubeType.Namespace,
 			KubeType:  "replicationController",
+			Labels:    kubeType.Spec.Template.Labels,
 		}
 		return
 
@@ -210,6 +216,7 @@ func ServiceAccountIter(t interface{}) (result *Result) {
 			DSA:       kubeType.Spec.Template.Spec.DeprecatedServiceAccount,
 			Token:     kubeType.Spec.Template.Spec.AutomountServiceAccountToken,
 			SA:        kubeType.Spec.Template.Spec.ServiceAccountName,
+			Labels:    kubeType.Spec.Template.Labels,
 			KubeType:  "deployment",
 		}
 		return
@@ -221,6 +228,7 @@ func ServiceAccountIter(t interface{}) (result *Result) {
 			DSA:       kubeType.Spec.Template.Spec.DeprecatedServiceAccount,
 			Token:     kubeType.Spec.Template.Spec.AutomountServiceAccountToken,
 			SA:        kubeType.Spec.Template.Spec.ServiceAccountName,
+			Labels:    kubeType.Spec.Template.Labels,
 			KubeType:  "statefulSet",
 		}
 		return
@@ -232,6 +240,7 @@ func ServiceAccountIter(t interface{}) (result *Result) {
 			DSA:       kubeType.Spec.Template.Spec.DeprecatedServiceAccount,
 			Token:     kubeType.Spec.Template.Spec.AutomountServiceAccountToken,
 			SA:        kubeType.Spec.Template.Spec.ServiceAccountName,
+			Labels:    kubeType.Spec.Template.Labels,
 			KubeType:  "daemonSet",
 		}
 		return
@@ -243,6 +252,7 @@ func ServiceAccountIter(t interface{}) (result *Result) {
 			DSA:       kubeType.Spec.DeprecatedServiceAccount,
 			Token:     kubeType.Spec.AutomountServiceAccountToken,
 			SA:        kubeType.Spec.ServiceAccountName,
+			Labels:    kubeType.Labels,
 			KubeType:  "pod",
 		}
 		return
@@ -254,6 +264,7 @@ func ServiceAccountIter(t interface{}) (result *Result) {
 			DSA:       kubeType.Spec.Template.Spec.DeprecatedServiceAccount,
 			Token:     kubeType.Spec.Template.Spec.AutomountServiceAccountToken,
 			SA:        kubeType.Spec.Template.Spec.ServiceAccountName,
+			Labels:    kubeType.Spec.Template.Labels,
 			KubeType:  "replicationController",
 		}
 		return
@@ -267,6 +278,7 @@ func ServiceAccountIter(t interface{}) (result *Result) {
 func getKubeResources(clientset *kubernetes.Clientset) (items []Items) {
 	// fetch deployments, statefulsets, daemonsets
 	// and pods which do not belong to another abstraction
+
 	deployments := getDeployments(clientset)
 	statefulSets := getStatefulSets(clientset)
 	daemonSets := getDaemonSets(clientset)
@@ -404,5 +416,13 @@ func runAudit(auditFunc interface{}) func(cmd *cobra.Command, args []string) {
 		for _, result := range results {
 			result.Print()
 		}
+
 	}
+}
+
+func prettifyReason(reason string) string {
+	if strings.ToLower(reason) == "true" {
+		return "Unspecified"
+	}
+	return reason
 }

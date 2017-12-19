@@ -4,17 +4,39 @@ import "github.com/spf13/cobra"
 
 func checkAllowPrivilegeEscalation(container Container, result *Result) {
 	if container.SecurityContext == nil {
-		occ := Occurrence{id: ErrorSecurityContextNIL, kind: Error, message: "SecurityContext not set, please set it!"}
+		occ := Occurrence{
+			id:      ErrorSecurityContextNIL,
+			kind:    Error,
+			message: "SecurityContext not set, please set it!",
+		}
+		result.Occurrences = append(result.Occurrences, occ)
+		return
+	}
+	if reason := result.Labels["kubeaudit.allow.privilegeEscalation"]; reason != "" {
+		occ := Occurrence{
+			id:       ErrorAllowPrivilegeEscalationTrueAllowed,
+			kind:     Warn,
+			message:  "Allowed setting AllowPrivilegeEscalation to true",
+			metadata: Metadata{"Reason": prettifyReason(reason)},
+		}
 		result.Occurrences = append(result.Occurrences, occ)
 		return
 	}
 	if container.SecurityContext.AllowPrivilegeEscalation == nil {
-		occ := Occurrence{id: ErrorAllowPrivilegeEscalationNIL, kind: Error, message: "AllowPrivilegeEscalation not set which allows privilege escalation, please set to false"}
+		occ := Occurrence{
+			id:      ErrorAllowPrivilegeEscalationNIL,
+			kind:    Error,
+			message: "AllowPrivilegeEscalation not set which allows privilege escalation, please set to false",
+		}
 		result.Occurrences = append(result.Occurrences, occ)
 		return
 	}
 	if *container.SecurityContext.AllowPrivilegeEscalation {
-		occ := Occurrence{id: ErrorAllowPrivilegeEscalationTrue, kind: Error, message: "AllowPrivilegeEscalation set to true, please set to false"}
+		occ := Occurrence{
+			id:      ErrorAllowPrivilegeEscalationTrue,
+			kind:    Error,
+			message: "AllowPrivilegeEscalation set to true, please set to false",
+		}
 		result.Occurrences = append(result.Occurrences, occ)
 		return
 	}
