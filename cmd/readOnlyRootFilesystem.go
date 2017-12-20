@@ -32,9 +32,6 @@ func auditReadOnlyRootFS(items Items) (results []Result) {
 			}
 		}
 	}
-	for _, result := range results {
-		result.Print()
-	}
 	return
 }
 

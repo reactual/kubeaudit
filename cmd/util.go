@@ -414,11 +414,13 @@ func getResults(resources []Items, auditFunc interface{}) []Result {
 func runAudit(auditFunc interface{}) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		if err := checkParams(auditFunc); err != nil {
+			log.Error("Parameter check failed")
 			log.Error(err)
 		}
 		setFormatter()
 		resources, err := getResources()
 		if err != nil {
+			log.Error("getResources failed")
 			log.Error(err)
 			return
 		}
