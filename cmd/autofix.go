@@ -27,7 +27,7 @@ func runAllAudits(resources []Items) (fixedResources Items) {
 
 func fixStuff(resource Items, results []Result) {
 	for _, result := range results {
-		for _, occurrence := range result.Occurrence {
+		for _, occurrence := range result.Occurrences {
 			switch occurrence.id {
 			case ErrorAllowPrivilegeEscalationNIL:
 			case ErrorAllowPrivilegeEscalationTrue:
