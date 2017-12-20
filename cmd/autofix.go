@@ -14,36 +14,35 @@ func getAuditFunctions() []interface{} {
 	}
 }
 
-func runAllAudits() {
-	resources, err := getResources()
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	for _, function := range getAuditFunctions() {
-		for _, result := range getResults(resources, function) {
-			fixStuff(result)
+func runAllAudits(resources []Items) (fixedResources Items) {
+	log.Error(len(resources))
+	for _, resource := range resources {
+		for _, function := range getAuditFunctions() {
+			results := getResults([]Items{resource}, function)
+			if len(results) > 0 {
+				log.Error(results)
+				log.Error(resource)
+				fixStuff(resource, results)
+			}
 		}
 	}
+	return fixedResources
 }
 
-func fixStuff(result Result) {
+func fixStuff(resource Items, results []Result) {
 	fmt.Println("fixing stuff")
 }
 
 func autofix(*cobra.Command, []string) {
-	decoded, err := readManifestFile(rootConfig.manifest)
+	items, err := getKubeResourcesManifest(rootConfig.manifest)
 	if err != nil {
-		return
+		log.Error(err)
 	}
-	for _, resource := range decoded {
-		fmt.Println(resource)
-	}
-	err = writeManifestFile(rootConfig.manifest, decoded)
-	if err != nil {
-		return
-	}
+	runAllAudits(items)
+	//err = writeManifestFile(rootConfig.manifest, decoded)
+	//if err != nil {
+	//	return
+	//}
 }
 
 var autofixCmd = &cobra.Command{
