@@ -12,7 +12,7 @@ func getAuditFunctions() []interface{} {
 	}
 }
 
-func runAllAudits(resources []Items) (fixedResources Items) {
+func runAllAudits(resources []Items) (issues map[Items][]Result) {
 	for _, resource := range resources {
 		var results []Result
 		for _, function := range getAuditFunctions() {
@@ -20,17 +20,27 @@ func runAllAudits(resources []Items) (fixedResources Items) {
 				results = append(results, result)
 			}
 		}
-		fixStuff(resource, results)
+		issues[resource] = results
 	}
-	return fixedResources
+	return issues
 }
 
-func fixStuff(resource Items, results []Result) {
+func (i *Items) fixPrivilegeEscalation() {
+	switch kubeType := i.(type) {
+	case Pod:
+		containers = kubeType.Spec.Containers
+	case default:
+		kubeType.Spec.Template.Spec.Containers
+	}
+}
+
+func fixStuff(resource Items, results []Result) (fixed Items) {
 	for _, result := range results {
 		for _, occurrence := range result.Occurrences {
 			switch occurrence.id {
 			case ErrorAllowPrivilegeEscalationNIL:
 			case ErrorAllowPrivilegeEscalationTrue:
+				fixPrivilegeEscalation(resource)
 			case ErrorCapabilitiesAdded:
 			case ErrorCapabilitiesNIL:
 			case ErrorCapabilitiesNoneDropped:
@@ -64,7 +74,11 @@ func autofix(*cobra.Command, []string) {
 	if err != nil {
 		log.Error(err)
 	}
-	runAllAudits(items)
+	issues := runAllAudits(items)
+	var fixed []Items
+	for resource, results := range issues {
+		fixed = append(fixed, fixStuff(resource, results))
+	}
 	//err = writeManifestFile(rootConfig.manifest, decoded)
 	//if err != nil {
 	//	return
