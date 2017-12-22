@@ -84,17 +84,15 @@ func checkMemoryLimit(container Container, limits limitFlags, result *Result) {
 	}
 }
 
-func auditLimits(limits limitFlags, resources []k8sRuntime.Object) (results []Result) {
+func auditLimits(limits limitFlags, resource k8sRuntime.Object) (results []Result) {
 	limits.parseLimitFlags()
 
-	for _, resource := range resources {
-		for _, container := range getContainers(resource) {
-			result := newResultFromResource(resource)
-			checkLimits(container, limits, &result)
-			if len(result.Occurrences) > 0 {
-				results = append(results, result)
-				break
-			}
+	for _, container := range getContainers(resource) {
+		result := newResultFromResource(resource)
+		checkLimits(container, limits, &result)
+		if len(result.Occurrences) > 0 {
+			results = append(results, result)
+			break
 		}
 	}
 	return

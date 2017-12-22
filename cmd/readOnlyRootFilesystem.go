@@ -23,15 +23,13 @@ func checkReadOnlyRootFS(container Container, result *Result) {
 	}
 }
 
-func auditReadOnlyRootFS(resources []k8sRuntime.Object) (results []Result) {
-	for _, resource := range resources {
-		for _, container := range getContainers(resource) {
-			result := newResultFromResource(resource)
-			checkReadOnlyRootFS(container, &result)
-			if len(result.Occurrences) > 0 {
-				results = append(results, result)
-				break
-			}
+func auditReadOnlyRootFS(resource k8sRuntime.Object) (results []Result) {
+	for _, container := range getContainers(resource) {
+		result := newResultFromResource(resource)
+		checkReadOnlyRootFS(container, &result)
+		if len(result.Occurrences) > 0 {
+			results = append(results, result)
+			break
 		}
 	}
 	return

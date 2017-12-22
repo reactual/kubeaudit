@@ -28,13 +28,11 @@ func checkAutomountServiceAccountToken(result *Result) {
 	}
 }
 
-func auditAutomountServiceAccountToken(resouces []k8sRuntime.Object) (results []Result) {
-	for _, resource := range resouces {
-		result := newResultFromResourceWithServiceAccountInfo(resource)
-		checkAutomountServiceAccountToken(&result)
-		if len(result.Occurrences) > 0 {
-			results = append(results, result)
-		}
+func auditAutomountServiceAccountToken(resource k8sRuntime.Object) (results []Result) {
+	result := newResultFromResourceWithServiceAccountInfo(resource)
+	checkAutomountServiceAccountToken(&result)
+	if len(result.Occurrences) > 0 {
+		results = append(results, result)
 	}
 	return
 }

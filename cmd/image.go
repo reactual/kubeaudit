@@ -51,15 +51,13 @@ func checkImage(container Container, image imgFlags, result *Result) {
 	}
 }
 
-func auditImages(image imgFlags, resources []k8sRuntime.Object) (results []Result) {
-	for _, resource := range resources {
-		for _, container := range getContainers(resource) {
-			result := newResultFromResource(resource)
-			checkImage(container, image, &result)
-			if len(result.Occurrences) > 0 {
-				results = append(results, result)
-				break
-			}
+func auditImages(image imgFlags, resource k8sRuntime.Object) (results []Result) {
+	for _, container := range getContainers(resource) {
+		result := newResultFromResource(resource)
+		checkImage(container, image, &result)
+		if len(result.Occurrences) > 0 {
+			results = append(results, result)
+			break
 		}
 	}
 	for _, result := range results {

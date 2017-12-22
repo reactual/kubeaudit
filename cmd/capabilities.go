@@ -86,15 +86,13 @@ func checkCapabilities(container Container, result *Result) {
 	}
 }
 
-func auditCapabilities(resources []k8sRuntime.Object) (results []Result) {
-	for _, resource := range resources {
-		for _, container := range getContainers(resource) {
-			result := newResultFromResource(resource)
-			checkCapabilities(container, &result)
-			if len(result.Occurrences) > 0 {
-				results = append(results, result)
-				break
-			}
+func auditCapabilities(resource k8sRuntime.Object) (results []Result) {
+	for _, container := range getContainers(resource) {
+		result := newResultFromResource(resource)
+		checkCapabilities(container, &result)
+		if len(result.Occurrences) > 0 {
+			results = append(results, result)
+			break
 		}
 	}
 	return

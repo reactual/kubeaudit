@@ -23,15 +23,13 @@ func checkAllowPrivilegeEscalation(container Container, result *Result) {
 	}
 }
 
-func auditAllowPrivilegeEscalation(resouces []k8sRuntime.Object) (results []Result) {
-	for _, resource := range resouces {
-		for _, container := range getContainers(resource) {
-			result := newResultFromResource(resource)
-			checkAllowPrivilegeEscalation(container, &result)
-			if len(result.Occurrences) > 0 {
-				results = append(results, result)
-				break
-			}
+func auditAllowPrivilegeEscalation(resource k8sRuntime.Object) (results []Result) {
+	for _, container := range getContainers(resource) {
+		result := newResultFromResource(resource)
+		checkAllowPrivilegeEscalation(container, &result)
+		if len(result.Occurrences) > 0 {
+			results = append(results, result)
+			break
 		}
 	}
 	return
