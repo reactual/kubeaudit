@@ -103,23 +103,19 @@ func newResultFromResourceWithServiceAccountInfo(resource k8sRuntime.Object) Res
 
 func getKubeResources(clientset *kubernetes.Clientset) (resources []k8sRuntime.Object) {
 	for _, resource := range getDeployments(clientset).Items {
-		var rto k8sRuntime.Object
-		rto = resource
-		resources = append(resources, k8sRuntime.Object(resource))
+		resources = append(resources, resource.DeepCopyObject())
 	}
-
 	for _, resource := range getStatefulSets(clientset).Items {
-		resources = append(resources, resource)
+		resources = append(resources, resource.DeepCopyObject())
 	}
-
 	for _, resource := range getDaemonSets(clientset).Items {
-		resources = append(resources, resource)
+		resources = append(resources, resource.DeepCopyObject())
 	}
 	for _, resource := range getPods(clientset).Items {
-		resources = append(resources, resource)
+		resources = append(resources, resource.DeepCopyObject())
 	}
 	for _, resource := range getReplicationControllers(clientset).Items {
-		resources = append(resources, resource)
+		resources = append(resources, resource.DeepCopyObject())
 	}
 
 	return
@@ -164,7 +160,7 @@ func setFormatter() {
 
 func checkParams(auditFunc interface{}) (err error) {
 	switch auditFunc.(type) {
-	case (func(image imgFlags, item Items) (results []Result)):
+	case (func(image imgFlags, resource k8sRuntime.Object) (results []Result)):
 		if len(imgConfig.img) == 0 {
 			return errors.New("Empty image name. Are you missing the image flag?")
 		}
